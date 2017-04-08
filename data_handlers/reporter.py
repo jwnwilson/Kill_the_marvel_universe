@@ -75,16 +75,21 @@ class MarvelReporter(BaseDataHandler):
     def build_character_graph(self):
         characters = self._get_character_list()
         self.character_graph = CharacterGraph()
-        self.character_graph.load_characters(characters)
+        self.character_graph.load_characters(characters, exclude_no_relations=True)
         self.character_graph.build_graph()
 
     def get_most_influential_characters(self, limit=None):
-        import pdb;pdb.set_trace()
         self.build_character_graph()
-        self.character_graph.save()
-        self.character_graph.show_graph()
+        #self.character_graph.save()
+        #self.character_graph.show_graph()
 
-        influential_characters = self.character_graph.get_highest_betweeness_centrality()
+        influential_characters_ids = self.character_graph.get_highest_betweeness_centrality()
+        influential_characters = [
+            self.api_data[str(char_id[0])] for char_id in influential_characters_ids]
+
+        influential_characters = self._get_list_character_attrs(
+            influential_characters, ['name', 'comics__available'])
+
         influential_characters = self._limit_list(
             influential_characters, limit)
 
