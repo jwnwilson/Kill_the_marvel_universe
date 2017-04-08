@@ -1,0 +1,2 @@
+class MarvelApiException(Exception):
+    pass
