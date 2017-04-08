@@ -3,6 +3,7 @@ import operator
 import sys
 
 from .base import BaseDataHandler
+from .graph import CharacterGraph
 
 
 class MarvelReporter(BaseDataHandler):
@@ -15,6 +16,7 @@ class MarvelReporter(BaseDataHandler):
         self.output_file=output_file
         self.reporter_data = {}
         self.read_api_data()
+        self.character_graph = None
 
     def write_api_data(self):
         super().write_api_data(self.output_file, 'reporter_data')
@@ -60,14 +62,33 @@ class MarvelReporter(BaseDataHandler):
 
         sys.stdout.write(self._format_data_list(names))
 
-    def most_popular_characters(self):
+    def most_popular_characters(self, limit=None):
         characters = self._get_character_list()
         characters = sorted(
             characters, key=lambda x: x['comics']['available'], reverse=True)
         characters = self._get_list_character_attrs(
             characters, ['name', 'comics__available'])
-        characters = self._limit_list(characters, 10)
+        characters = self._limit_list(characters, limit)
 
         sys.stdout.write(self._format_data_list(characters))
+
+    def build_character_graph(self):
+        characters = self._get_character_list()
+        self.character_graph = CharacterGraph()
+        self.character_graph.load_characters(characters)
+        self.character_graph.build_graph()
+
+    def get_most_influential_characters(self, limit=None):
+        import pdb;pdb.set_trace()
+        self.build_character_graph()
+        self.character_graph.save()
+        self.character_graph.show_graph()
+
+        influential_characters = self.character_graph.get_highest_betweeness_centrality()
+        influential_characters = self._limit_list(
+            influential_characters, limit)
+
+        sys.stdout.write(self._format_data_list(
+            influential_characters))
 
 

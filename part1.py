@@ -11,7 +11,7 @@ def get_alphabetic_characters():
 
 def get_most_popular():
     reporter = MarvelReporter()
-    reporter.most_popular_characters()
+    reporter.most_popular_characters(limit=10)
 
 
 if __name__ == "__main__":
