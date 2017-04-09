@@ -1,9 +1,12 @@
 from functools import reduce
+import logging
 import operator
 import sys
 
 from .base import BaseDataHandler
 from .graph import CharacterGraph
+
+logger = logging.getLogger(__name__)
 
 
 class MarvelReporter(BaseDataHandler):
@@ -78,17 +81,38 @@ class MarvelReporter(BaseDataHandler):
         self.character_graph.load_characters(characters, exclude_no_relations=True)
         self.character_graph.build_graph()
 
-    def get_most_influential_characters(self, limit=None):
-        self.build_character_graph()
-        #self.character_graph.save()
-        #self.character_graph.show_graph()
+    def get_most_influential_characters(
+            self,
+            limit=None,
+            algorithm='betweenness_centrality',
+            show_graph=True):
 
-        influential_characters_ids = self.character_graph.get_highest_betweeness_centrality()
-        influential_characters = [
-            self.api_data[str(char_id[0])] for char_id in influential_characters_ids]
+        self.build_character_graph()
+
+        influential_characters = []
+        if algorithm == 'betweenness_centrality':
+            influential_characters_ids = self.character_graph.get_highest_betweeness_centrality()
+        elif algorithm == 'degree':
+            influential_characters_ids = self.character_graph.get_degree_centrality()
+        elif algorithm == 'in_degree':
+            influential_characters_ids = self.character_graph.get_in_degree_centrality()
+        elif algorithm == 'out_degree':
+            influential_characters_ids = self.character_graph.get_out_degree_centrality()
+        elif algorithm == 'average_degree':
+            logger.error('Not implemented')
+            raise RuntimeException('Algorithm not implemented')
+            influential_characters_ids = self.character_graph.get_average_degree_centrality()
+        else:
+            logger.error('invalid algorithm: "{}"'.format(algorithm))
+            raise RuntimeException('Invalid algorithm')
+
+        for i, char_id in enumerate(influential_characters_ids):
+            character = self.api_data[str(char_id[0])]
+            character[algorithm] = char_id[1]
+            influential_characters.append(character)
 
         influential_characters = self._get_list_character_attrs(
-            influential_characters, ['name', 'comics__available'])
+            influential_characters, ['name', algorithm])
 
         influential_characters = self._limit_list(
             influential_characters, limit)
@@ -96,4 +120,5 @@ class MarvelReporter(BaseDataHandler):
         sys.stdout.write(self._format_data_list(
             influential_characters))
 
-
+        if show_graph:
+            self.character_graph.show_graph()
