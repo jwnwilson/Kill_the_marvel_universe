@@ -4,9 +4,9 @@ import logging
 from data_handlers.reporter import MarvelReporter
 
 
-def get_most_influential(**kwargs):
+def get_most_inbetween(**kwargs):
     reporter = MarvelReporter()
-    return reporter.get_most_influential_characters(**kwargs)
+    return reporter.get_most_inbetween_characters(**kwargs)
 
 
 if __name__ == "__main__":
@@ -24,5 +24,4 @@ if __name__ == "__main__":
     if args.algorithm:
         kwargs['algorithm'] = args.algorithm
 
-    get_most_influential(**kwargs)
-
+    get_most_inbetween(**kwargs)

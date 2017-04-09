@@ -14,10 +14,11 @@ Plan of attack:
 
 - (DONE) Render graph to show character connections
 
-- Calculate influence based on similar logic from previous project
+- Calculate influence based on similar logic from previous project using nx.neighbors to get basic
+  influence of character and the surrounding characters to n levels
 
 - Highlight high influence characters on graph and remove low influence to make it easier to digest
 
-- Use community to work out the communities in the marvel universe and then find the most connected community bridges that will cover the most communities
+- Use community to work out the communities in the marvel universe and then find the most connected community bridges that will cover the most communities (Might be very similar to betweeness centrality already calculated)
 
 - Show reasons for going for community links based on research that they are the ones who need to be vaccinated first inepidemics to fight them. 

@@ -93,10 +93,23 @@ class MarvelReporter(BaseDataHandler):
 
         return influential_characters_ids
 
-    def get_most_influential_characters(
+    def get_most_inbetween_characters(self, limit=None, show_graph=True):
+        return self.get_characters_data(
+            limit=limit,
+            algorithm='betweenness_centrality',
+            show_graph=show_graph)
+
+    def get_most_influential_characters(self, limit=None, show_graph=True):
+        return self.get_characters_data(
+            limit=limit,
+            show_graph=show_graph,
+            algorithm='degree'
+        )
+
+    def get_characters_data(
             self,
             limit=None,
-            algorithm='betweenness_centrality',
+            algorithm='degree',
             show_graph=True):
 
         self.build_character_graph()
