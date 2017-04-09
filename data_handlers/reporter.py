@@ -82,23 +82,12 @@ class MarvelReporter(BaseDataHandler):
         self.character_graph.build_graph()
 
     def _run_algorithm(self, algorithm):
-        if algorithm == 'betweenness_centrality':
-            influential_characters_ids = self.character_graph.get_highest_betweeness_centrality()
-        elif algorithm == 'degree':
-            influential_characters_ids = self.character_graph.get_degree_centrality()
-        elif algorithm == 'in_degree':
-            influential_characters_ids = self.character_graph.get_in_degree_centrality()
-        elif algorithm == 'out_degree':
-            influential_characters_ids = self.character_graph.get_out_degree_centrality()
-        elif algorithm == 'katz_centrality':
-            influential_characters_ids = self.character_graph.get_katz_centrality()
-        elif algorithm == 'eigenvector_centrality':
-            influential_characters_ids = self.character_graph.get_eigenvector_centrality()
-        elif algorithm == 'average_degree':
+        try:
+            influential_characters_ids = self.character_graph.get_algorithm(algorithm)
+        except AttributeError:
             logger.error('Not implemented')
             raise RuntimeException('Algorithm not implemented')
-            influential_characters_ids = self.character_graph.get_average_degree_centrality()
-        else:
+        except:
             logger.error('invalid algorithm: "{}"'.format(algorithm))
             raise RuntimeException('Invalid algorithm')
 

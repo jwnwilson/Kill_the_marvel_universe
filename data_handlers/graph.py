@@ -86,33 +86,9 @@ class CharacterGraph():
 
         return character_ids
 
-    def get_degree_centrality(self):
+    def get_algorithm(self, algorithm_name):
         return self._run_centrality_algorithm(
-            nx.degree_centrality)
-
-    def get_in_degree_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.in_degree_centrality)
-
-    def get_out_degree_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.out_degree_centrality)
-
-    def get_average_degree_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.k_nearest_neighbors)
-
-    def get_katz_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.katz_centrality_numpy)
-
-    def get_eigenvector_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.eigenvector_centrality)
-
-    def get_highest_betweeness_centrality(self):
-        return self._run_centrality_algorithm(
-            nx.betweenness_centrality, normalized=True)
+            getattr(nx, algorithm_name))
 
     def _create_labels(self, attr):
         nodes = self.graph.nodes(data=True)
