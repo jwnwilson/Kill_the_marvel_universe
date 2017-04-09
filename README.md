@@ -16,6 +16,8 @@ Plan of attack:
 
 - Calculate influence based on similar logic from previous project
 
+- Highlight high influence characters on graph and remove low influence to make it easier to digest
+
 - Use community to work out the communities in the marvel universe and then find the most connected community bridges that will cover the most communities
 
 - Show reasons for going for community links based on research that they are the ones who need to be vaccinated first inepidemics to fight them. 
