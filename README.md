@@ -2,7 +2,7 @@ Kill the marvel universe Exercise
 
 Plan of attack:
 
-- (DONE) Build simple scraper with grequests for character API use comic IDs as that's all we need save data into characters.json (check comic ID limit doesn't break anything)  
+- (DONE) Build simple scraper with grequests for character API use comic IDs as that's all we need save data into characters.json (check comic ID limit doesn't break anything)
 
 - (DONE) Write a simple reporter to output all characters alphabetically
 
@@ -18,6 +18,10 @@ Plan of attack:
   influence of character and the surrounding characters to n levels - Looks like similar results to
   degree algorithm already implemented so will need to investigate graph to make sure it's built
   correctly
+
+- After analysing the data, looks like the results could be correct but the amount of comic
+  relations on each character is limited to 20 on initial API call I thought I checked this as per my
+  notes, will have to go through characters for > 20 relations and make additional calls to get their extra relations
 
 - Highlight high influence characters on graph and remove low influence to make it easier to digest
 
