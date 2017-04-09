@@ -14,8 +14,10 @@ Plan of attack:
 
 - (DONE) Render graph to show character connections
 
-- Calculate influence based on similar logic from previous project using nx.neighbors to get basic
-  influence of character and the surrounding characters to n levels
+- (DONE) Calculate influence based on similar logic from previous project using nx.neighbors to get basic
+  influence of character and the surrounding characters to n levels - Looks like similar results to
+  degree algorithm already implemented so will need to investigate graph to make sure it's built
+  correctly
 
 - Highlight high influence characters on graph and remove low influence to make it easier to digest
 
