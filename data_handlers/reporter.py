@@ -81,15 +81,7 @@ class MarvelReporter(BaseDataHandler):
         self.character_graph.load_characters(characters, exclude_no_relations=True)
         self.character_graph.build_graph()
 
-    def get_most_influential_characters(
-            self,
-            limit=None,
-            algorithm='betweenness_centrality',
-            show_graph=True):
-
-        self.build_character_graph()
-
-        influential_characters = []
+    def _run_algorithm(self, algorithm):
         if algorithm == 'betweenness_centrality':
             influential_characters_ids = self.character_graph.get_highest_betweeness_centrality()
         elif algorithm == 'degree':
@@ -98,6 +90,10 @@ class MarvelReporter(BaseDataHandler):
             influential_characters_ids = self.character_graph.get_in_degree_centrality()
         elif algorithm == 'out_degree':
             influential_characters_ids = self.character_graph.get_out_degree_centrality()
+        elif algorithm == 'katz_centrality':
+            influential_characters_ids = self.character_graph.get_katz_centrality()
+        elif algorithm == 'eigenvector_centrality':
+            influential_characters_ids = self.character_graph.get_eigenvector_centrality()
         elif algorithm == 'average_degree':
             logger.error('Not implemented')
             raise RuntimeException('Algorithm not implemented')
@@ -106,6 +102,18 @@ class MarvelReporter(BaseDataHandler):
             logger.error('invalid algorithm: "{}"'.format(algorithm))
             raise RuntimeException('Invalid algorithm')
 
+        return influential_characters_ids
+
+    def get_most_influential_characters(
+            self,
+            limit=None,
+            algorithm='betweenness_centrality',
+            show_graph=True):
+
+        self.build_character_graph()
+        influential_characters_ids = self._run_algorithm(algorithm)
+
+        influential_characters = []
         for i, char_id in enumerate(influential_characters_ids):
             character = self.api_data[str(char_id[0])]
             character[algorithm] = char_id[1]
