@@ -14,9 +14,7 @@ fi
 # Simple setup script to install temporary venv into project directory to make cleaning up easier
 if [ ! -d ./venv ]
 then
-    sudo easy_install pip3
-    pip3 install virtualenv
-    python -m venv venv
+    python3 -m venv venv
     source ./venv/bin/activate
     pip3 install -r requirements.txt
 fi

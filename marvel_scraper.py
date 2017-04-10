@@ -12,26 +12,39 @@ def get_character_data(**kwargs):
     Args:
         kwargs: (dict) api kwargs to be passed directly to requests
     """
-    scraper = MarvelScapper()
+    scraper = MarvelScapper('data/api_data/characters.json')
     scraper.get_characters(**kwargs)
 
 
-def get_comic_data(**kwargs):
+def get_character_comic_data(**kwargs):
     """
-    Use Scraper to get comic data and load it into a file for the reporter
+    Use Scraper to get character comic data and load it into a file for the reporter
     to report with.
 
     Args:
         kwargs: (dict) api kwargs to be passed directly to requests
     """
-    scraper = MarvelScapper()
+    scraper = MarvelScapper('data/api_data/characters.json')
     scraper.get_character_comics(**kwargs)
+
+
+def get_comic_data(**kwargs):
+    """
+        Use Scraper to get comic data and load it into a file for the reporter
+        to report with.
+
+        Args:
+            kwargs: (dict) api kwargs to be passed directly to requests
+        """
+    scraper = MarvelScapper('data/api_data/comics.json')
+    scraper.get_comics(**kwargs)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     parser = argparse.ArgumentParser()
     parser.add_argument("-characters", action='store_true')
+    parser.add_argument("-character_comics", action='store_true')
     parser.add_argument("-comics", action='store_true')
     parser.add_argument("--start", default=0)
     parser.add_argument("--end", default=0)
@@ -46,6 +59,8 @@ if __name__ == "__main__":
 
     if args.characters:
         get_character_data(**kwargs)
+    elif args.character_comics:
+        get_character_comic_data(**kwargs)
     elif args.comics:
         get_comic_data(**kwargs)
     else:

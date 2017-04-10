@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class MarvelScapper(BaseDataHandler):
 
-    def __init__(self, api_source_data_file='data/api_data/characters.json'):
+    def __init__(self, api_source_data_file):
         super().__init__()
         self.api = MarvelApi()
         self._api_source_data_file = api_source_data_file
@@ -20,12 +20,6 @@ class MarvelScapper(BaseDataHandler):
 
     def read_api_data(self):
         super().read_api_data(self._api_source_data_file, 'api_data')
-
-    def get_total_characters(self):
-        api_data = self.api.get('characters', {'limit': 1}, timeout=10)
-        if not api_data:
-            raise RuntimeException('Initial api call failed please try again.')
-        return api_data['data']['total']
 
     def _store_raw_api_data(self, url, api_data):
         """
@@ -67,17 +61,23 @@ class MarvelScapper(BaseDataHandler):
 
             # write api data to source file
             self.write_api_data()
+            
+    def get_total(self, api_endpoint):
+        api_data = self.api.get(api_endpoint, {'limit': 1}, timeout=10)
+        if not api_data:
+            raise RuntimeError('Initial api call failed please try again.')
+        return api_data['data']['total']
 
     def get_characters(self, **kwargs):
         """
-        Get api source data and write it to file for use by reporters
+        Get api source data for characters and write it to file for use by reporters
         """
         start = kwargs.get('start', 0)
         api_max_limit = kwargs.get('limit', 100)
         param_list = []
 
         # Get total number of characters
-        total_characters = self.get_total_characters()
+        total_characters = self.get_total('characters')
 
         # create batch commands for api
         for x in range(start, total_characters, (api_max_limit)):
@@ -85,6 +85,27 @@ class MarvelScapper(BaseDataHandler):
             param_list.append(params)
 
         url_list = ['characters' for x in range(len(param_list))]
+
+        self._batch_get_url_list(
+            url_list, param_list, store_func=self._store_raw_api_data)
+    
+    def get_comics(self, **kwargs):
+        """
+        Get api source data for comics and write it to file for use by reporters
+        """
+        start = kwargs.get('start', 0)
+        api_max_limit = kwargs.get('limit', 100)
+        param_list = []
+
+        # Get total number of comics
+        total_comics = self.get_total('comics')
+
+        # create batch commands for api
+        for x in range(start, total_comics, (api_max_limit)):
+            params = {'offset': x, 'limit': api_max_limit}
+            param_list.append(params)
+
+        url_list = ['comics' for x in range(len(param_list))]
 
         self._batch_get_url_list(
             url_list, param_list, store_func=self._store_raw_api_data)
