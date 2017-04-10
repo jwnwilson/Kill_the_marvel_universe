@@ -3,6 +3,8 @@ import logging
 import matplotlib.pyplot as plt
 import networkx as nx
 
+from .exceptions import NotImplemented
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,10 +36,12 @@ class CharacterGraph():
         self.graph_built = False
 
     def save(self):
-        nx.write_graphml(self.graph, "test.gml")
+        raise NotImplemented
+        #nx.write_graphml(self.graph, "test.gml")
 
     def load(self):
-        self.graph = nx.read_gml('test.gml')
+        raise NotImplemented
+        #self.graph = nx.read_gml('test.gml')
 
     def load_characters(self, character_data_list, exclude_no_relations=False):
         for char_dict in character_data_list:
@@ -100,7 +104,7 @@ class CharacterGraph():
 
         for node in self.graph.nodes(data=True):
             character = node[1]['character']
-            neighbor_steps = 0
+            neighbor_steps = 1
             influence = _get_neighbors_influence(node[0], neighbor_steps, 0)
             character.data['neighbor_influence'] = influence
 
