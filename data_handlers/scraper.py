@@ -1,3 +1,4 @@
+from copy import deepcopy
 import logging
 
 from api.api import MarvelApi
@@ -12,6 +13,7 @@ class MarvelScapper(BaseDataHandler):
         super().__init__()
         self.api = MarvelApi()
         self._api_source_data_file = api_source_data_file
+        self.batch_size = 3
 
     def write_api_data(self):
         super().write_api_data(self._api_source_data_file, 'api_data')
@@ -25,7 +27,7 @@ class MarvelScapper(BaseDataHandler):
             raise RuntimeException('Initial api call failed please try again.')
         return api_data['data']['total']
 
-    def store_raw_api_data(self, api_data):
+    def _store_raw_api_data(self, url, api_data):
         """
         We need to store each character by it's index in a dictionary so our reporters
         can use it later
@@ -34,22 +36,48 @@ class MarvelScapper(BaseDataHandler):
             result_id = result['id']
             self.api_data[result_id] = result
 
+    def _update_comic_data(self, url, api_data):
+        character_id = url.split('/')[1]
+        character = self.api_data[character_id]
+        character['comics']['items'] = [
+            {'resourcesURI': x['resourceURI']} for x in api_data['data']['results']]
+
+    def _batch_get_url_list(self, url_list, param_list, store_func):
+        url_list = deepcopy(url_list)
+        # get api data if a call failed retry
+        while url_list:
+            url_batch = url_list[:self.batch_size]
+            param_batch = param_list[:self.batch_size]
+
+            api_data_list = self.api.batch_get(url_batch, param_batch)
+
+            # set backwards through enumerated list so we can safely pop successfull
+            # calls
+            i = 2
+            for url, api_data in zip(reversed(url_batch), reversed(api_data_list)):
+                if api_data:
+                    store_func(url, api_data)
+                    url_list.pop(i)
+                    param_list.pop(i)
+                else:
+                    logger.info('Retrying url: {}, params: {}'.format(
+                        url_list[i], str(param_list[i])
+                    ))
+                i -= 1
+
+            # write api data to source file
+            self.write_api_data()
+
     def get_characters(self, **kwargs):
         """
         Get api source data and write it to file for use by reporters
         """
         start = kwargs.get('start', 0)
-        end = kwargs.get('end')
-        current = start
-        batch_size = 3
-        api_max_limit = 100
-        url_list = []
+        api_max_limit = kwargs.get('limit', 100)
         param_list = []
 
         # Get total number of characters
         total_characters = self.get_total_characters()
-        if not end:
-            end = total_characters
 
         # create batch commands for api
         for x in range(start, total_characters, (api_max_limit)):
@@ -58,25 +86,44 @@ class MarvelScapper(BaseDataHandler):
 
         url_list = ['characters' for x in range(len(param_list))]
 
-        # get api data if a call failed retry
-        while url_list:
-            url_batch = url_list[:batch_size]
-            param_batch = param_list[:batch_size]
+        self._batch_get_url_list(
+            url_list, param_list, store_func=self._store_raw_api_data)
 
-            api_data_list = self.api.batch_get(url_batch, param_batch)
+    def get_character_comics(self, **kwargs):
+        """
+        Some characters have more than the default limit 20 comics
+        we need to add their remaining commics
+        
+        Returns:
+            None
+        """
+        # Get characters
+        characters_more_comics = []
+        url_list = []
+        param_list = []
 
-            # set backwards through enumerated list so we can safely pop successfull
-            # calls
-            for i, api_data in reversed(list(enumerate(api_data_list))):
-                if api_data:
-                    self.store_raw_api_data(api_data)
-                    url_list.pop(i)
-                    param_list.pop(i)
-                else:
-                    logger.info('Retrying url: {}, params: {}'.format(
-                        url_list[i], str(param_list[i])
-                    ))
+        self.read_api_data()
+        characters_ids = self.api_data.keys()
 
-            # write api data to source file
-            self.write_api_data()
+        # Get characters > 20 comics
+        for char_id in characters_ids:
+            char = self.api_data[char_id]
+            if char['comics']['available'] > 20:
+                characters_more_comics.append(char)
 
+        # Create list of urls and params
+        for char in characters_more_comics:
+            param_list.append({
+                'limit': 100
+            })
+            url_list.append('characters/{}/comics'.format(
+                char['id']
+            ))
+
+        logger.info('{} Characters need more comic data'.format(
+            len(characters_more_comics)
+        ))
+
+        # Batch load comics for characters
+        self._batch_get_url_list(
+            url_list, param_list, store_func=self._update_comic_data)
