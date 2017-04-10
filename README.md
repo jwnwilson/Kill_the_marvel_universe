@@ -28,3 +28,7 @@ Plan of attack:
 - Use community to work out the communities in the marvel universe and then find the most connected community bridges that will cover the most communities (Might be very similar to betweeness centrality already calculated)
 
 - Show reasons for going for community links based on research that they are the ones who need to be vaccinated first inepidemics to fight them. 
+
+- Clean up project finish tests and update coverage
+
+- Add instructions on how to run crawler and different algorithms on data
