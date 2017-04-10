@@ -22,9 +22,11 @@ Plan of attack:
   degree algorithm already implemented so will need to investigate graph to make sure it's built
   correctly
 
-- (Done)  After analysing the data, looks like the results could be correct but the amount of comic
+- (DONE) After analysing the data, looks like the results could be correct but the amount of comic
   relations on each character is limited to 20 on initial API call I thought I checked this as per my
   notes, will have to go through characters for > 20 relations and make additional calls to get their extra relations
+
+- (DONE) Added comic API scraping and after loading all the comic data got much more expected results
 
 - Clean up project, remove redundant code, write tests and update coverage
 
