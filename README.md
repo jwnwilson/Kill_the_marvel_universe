@@ -1,5 +1,8 @@
 Kill the marvel universe Exercise
 
+Please note the focus of this exercise is analyzing data and data science, I'm neglecting code quality to allow me to
+focus on experimenting with new tools, this is not production friendly work flow.
+
 Plan of attack:
 
 - (DONE) Build simple scraper with grequests for character API use comic IDs as that's all we need save data into characters.json (check comic ID limit doesn't break anything)
@@ -19,16 +22,18 @@ Plan of attack:
   degree algorithm already implemented so will need to investigate graph to make sure it's built
   correctly
 
-- After analysing the data, looks like the results could be correct but the amount of comic
+- (Done)  After analysing the data, looks like the results could be correct but the amount of comic
   relations on each character is limited to 20 on initial API call I thought I checked this as per my
   notes, will have to go through characters for > 20 relations and make additional calls to get their extra relations
+
+- Clean up project, remove redundant code, write tests and update coverage
+
+- Reduce amount of comic data / character data stored from api scraper
 
 - Highlight high influence characters on graph and remove low influence to make it easier to digest
 
 - Use community to work out the communities in the marvel universe and then find the most connected community bridges that will cover the most communities (Might be very similar to betweeness centrality already calculated)
 
 - Show reasons for going for community links based on research that they are the ones who need to be vaccinated first inepidemics to fight them. 
-
-- Clean up project finish tests and update coverage
 
 - Add instructions on how to run crawler and different algorithms on data
