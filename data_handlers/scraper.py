@@ -47,7 +47,7 @@ class MarvelScapper(BaseDataHandler):
 
             # set backwards through enumerated list so we can safely pop successfull
             # calls
-            i = 2
+            i = (len(url_batch) - 1)
             for url, api_data in zip(reversed(url_batch), reversed(api_data_list)):
                 if api_data:
                     store_func(url, api_data)
