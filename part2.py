@@ -18,7 +18,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     kwargs = {
-        'limit': int(args.limit) or 10,
+        'limit': int(args.limit or 10),
         'show_graph': args.show_graph
     }
 

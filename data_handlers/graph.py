@@ -17,8 +17,8 @@ class CharacterNode():
 
     def _get_comic_ids(self):
         for comic in self.data['comics']['items']:
-            self.comic_ids.append(self._get_id_from_resource(
-                comic['resourceURI']))
+            self.comic_ids.append(
+                self._get_id_from_resource(comic['resourceURI']))
 
     def __repr__(self):
         return '<{} {}>'.format(

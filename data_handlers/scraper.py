@@ -40,7 +40,7 @@ class MarvelScapper(BaseDataHandler):
         character_id = url.split('/')[1]
         character = self.api_data[character_id]
         character['comics']['items'] = [
-            {'resourcesURI': x['resourceURI']} for x in api_data['data']['results']]
+            {'resourceURI': x['resourceURI']} for x in api_data['data']['results']]
 
     def _batch_get_url_list(self, url_list, param_list, store_func):
         url_list = deepcopy(url_list)
