@@ -10,25 +10,26 @@ logger = logging.getLogger(__name__)
 
 
 class MarvelReporter(BaseDataHandler):
-    def __init__(
-            self,
-            input_file='data/api_data/characters.json',
-            output_file='data/reporter_data.json'):
+    def __init__(self, output_file='reporter_data.json'):
         super().__init__()
-        self.input_file=input_file
+        self.input_prefix='data/api_data/'
+        self.output_prefix = 'data/'
         self.output_file=output_file
         self.reporter_data = {}
-        self.read_api_data()
+        self.read_api_data('characters')
+        self.read_api_data('comics')
         self.character_graph = None
 
     def write_api_data(self):
-        super().write_api_data(self.output_file, 'reporter_data')
+        super().write_api_data(
+            self.output_prefix + self.output_file, self.reporter_data)
 
-    def read_api_data(self):
-        super().read_api_data(self.input_file, 'api_data')
+    def read_api_data(self, data_type):
+        self.api_data[data_type] = super().read_api_data(
+            self.input_prefix + data_type + '.json')
 
     def _get_character_list(self, **kwargs):
-        char_list = [self.api_data[x] for x in self.api_data]
+        char_list = [self.api_data['characters'][x] for x in self.api_data['characters']]
         if kwargs:
             char_list = sorted(char_list, **kwargs)
         return char_list
@@ -80,17 +81,17 @@ class MarvelReporter(BaseDataHandler):
         characters = self._get_character_list()
         self.character_graph = CharacterGraph()
         self.character_graph.load_characters(characters, exclude_no_relations=True)
-        self.character_graph.build_graph()
+        self.character_graph.build_graph(comic_data=self.api_data['comics'])
 
     def _run_algorithm(self, algorithm):
         try:
             influential_characters_ids = self.character_graph.get_algorithm(algorithm)
         except AttributeError:
             logger.error('Not implemented')
-            raise RuntimeException('Algorithm not implemented')
+            raise RuntimeError('Algorithm not implemented')
         except:
             logger.error('invalid algorithm: "{}"'.format(algorithm))
-            raise RuntimeException('Invalid algorithm')
+            raise RuntimeError('Invalid algorithm')
 
         return influential_characters_ids
 
@@ -102,8 +103,8 @@ class MarvelReporter(BaseDataHandler):
 
     def get_most_influential_characters(self, limit=None, show_graph=True):
         # Set empty influence value
-        for char_id in self.api_data:
-            self.api_data[char_id]['neighbor_influence'] = 0
+        for char_id in self.api_data['characters']:
+            self.api_data['characters'][char_id]['neighbor_influence'] = 0
 
         self.build_character_graph()
         self.character_graph.calculate_influence_from_neighbors()
@@ -131,7 +132,7 @@ class MarvelReporter(BaseDataHandler):
         # create character data from returned ids
         influential_characters = []
         for char_id in influential_characters_ids:
-            character = self.api_data[str(char_id[0])]
+            character = self.api_data['characters'][str(char_id[0])]
             character[algorithm] = char_id[1]
             influential_characters.append(character)
 

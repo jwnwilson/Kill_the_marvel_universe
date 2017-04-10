@@ -13,18 +13,17 @@ class BaseDataHandler():
     def __init__(self):
         self.api_data = {}
 
-    def read_api_data(self, file_path, attr):
+    def read_api_data(self, file_path):
         try:
             with open(file_path, 'rb') as input_fp:
-                setattr(self, attr, json.loads(input_fp.read()))
+                return json.loads(input_fp.read())
         except (IOError, JSONDecodeError):
             logger.error('Unable to load api data file.')
 
-    def write_api_data(self, file_path, attr):
+    def write_api_data(self, file_path, data):
         try:
             with open(file_path, 'wb') as output_fp:
-                output_fp.write(
-                    json.dumps(getattr(self, attr)).encode('utf-8'))
+                output_fp.write(data)
         except (IOError, JSONDecodeError):
             logger.error('Unable to write api data file.')
 

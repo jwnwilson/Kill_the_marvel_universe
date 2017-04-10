@@ -6,8 +6,9 @@ from data_handlers.reporter import MarvelReporter
 
 def get_most_influential(**kwargs):
     reporter = MarvelReporter()
-    return reporter.get_most_influential_characters(**kwargs)
-
+    reporter.get_most_influential_characters(**kwargs)
+    print('-----------------------------------')
+    reporter.get_characters_centrality(**kwargs)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

@@ -12,14 +12,15 @@ class MarvelScapper(BaseDataHandler):
     def __init__(self, api_source_data_file):
         super().__init__()
         self.api = MarvelApi()
+        self.api_data = {}
         self._api_source_data_file = api_source_data_file
         self.batch_size = 3
 
     def write_api_data(self):
-        super().write_api_data(self._api_source_data_file, 'api_data')
+        super().write_api_data(self._api_source_data_file, self.api_data)
 
     def read_api_data(self):
-        super().read_api_data(self._api_source_data_file, 'api_data')
+        self.api_data = super().read_api_data(self._api_source_data_file)
 
     def _store_raw_api_data(self, url, api_data):
         """
