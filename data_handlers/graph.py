@@ -54,24 +54,30 @@ class CharacterGraph():
                 character=char_inst,
                 comic_ids=char_inst.comic_ids)
 
+    def _relations_from_character_data(self):
+        for node in self.graph.nodes(data=True):
+            comic_ids = node[1]['comic_ids']
+            character = node[1]['character']
+            for comic_id in comic_ids:
+                if comic_id not in self.comic_relations:
+                    self.comic_relations[comic_id] = set()
+                self.comic_relations[comic_id].add(
+                    character.character_id)
+
+    def _relations_from_comic_data(self, comic_data):
+        for comic_id in comic_data:
+            self.comic_relations[comic_id] = set()
+            comic = comic_data[comic_id]
+            for character in comic['characters']['items']:
+                char_id = int(_get_id_from_resource(character['resourceURI']))
+                if char_id in self.graph:
+                    self.comic_relations[comic_id].add(char_id)
+
     def build_comic_relations(self, comic_data=None):
         if not comic_data:
-            for node in self.graph.nodes(data=True):
-                comic_ids = node[1]['comic_ids']
-                character = node[1]['character']
-                for comic_id in comic_ids:
-                    if comic_id not in self.comic_relations:
-                        self.comic_relations[comic_id] = set()
-                    self.comic_relations[comic_id].add(
-                        character.character_id)
+            self._relations_from_character_data()
         else:
-            for comic_id in comic_data:
-                self.comic_relations[comic_id] = set()
-                comic = comic_data[comic_id]
-                for character in comic['characters']['items']:
-                    char_id = int(_get_id_from_resource(character['resourceURI']))
-                    if char_id in self.graph:
-                        self.comic_relations[comic_id].add(char_id)
+            self._relations_from_comic_data()
 
     def load_character_edges(self):
         for comic_id in self.comic_relations:
@@ -86,27 +92,6 @@ class CharacterGraph():
         self.build_comic_relations(comic_data=comic_data)
         self.load_character_edges()
         self.graph_built = True
-
-    def calculate_influence_from_neighbors(self):
-        def _get_neighbors_influence(node_id, neighbor_steps, influence):
-            neighbors = self.graph.neighbors(node_id)
-            influence += len(neighbors)
-
-            if neighbor_steps > 0:
-                neighbor_steps -= 1
-                for neighbor in neighbors:
-                    influence = _get_neighbors_influence(
-                        neighbor, neighbor_steps, influence)
-            return influence
-
-        if not self.build_graph:
-            logger.error('Graph not built unable to caculate neighbor influence')
-
-        for node in self.graph.nodes(data=True):
-            character = node[1]['character']
-            neighbor_steps = 1
-            influence = _get_neighbors_influence(node[0], neighbor_steps, 0)
-            character.data['neighbor_influence'] = influence
 
     def _run_centrality_algorithm(self, algorithm, **kwargs):
         character_ids = []

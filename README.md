@@ -39,3 +39,20 @@ Plan of attack:
 - Show reasons for going for community links based on research that they are the ones who need to be vaccinated first inepidemics to fight them. 
 
 - Add instructions on how to run crawler and different algorithms on data
+
+
+Usage:
+
+Algorithm options:
+
+- degree_centrality
+- closeness_centrality
+- eigenvector_centrality
+- katz_centrality
+- betweenness_centrality
+
+$ marvel_reporter.py --algorithm $ALGORITHM -show_graph
+
+e.g.
+
+$ marvel_reporter.py --algorithm eigenvector_centrality
