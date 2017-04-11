@@ -77,7 +77,7 @@ class CharacterGraph():
         if not comic_data:
             self._relations_from_character_data()
         else:
-            self._relations_from_comic_data()
+            self._relations_from_comic_data(comic_data)
 
     def load_character_edges(self):
         for comic_id in self.comic_relations:
