@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from data_handlers.scraper import MarvelScapper
+from data_handlers.scraper import MarvelScraper
 
 
 def get_character_data(**kwargs):
@@ -12,7 +12,7 @@ def get_character_data(**kwargs):
     Args:
         kwargs: (dict) api kwargs to be passed directly to requests
     """
-    scraper = MarvelScapper('data/api_data/characters.json')
+    scraper = MarvelScraper('data/api_data/characters.json')
     scraper.get_characters(**kwargs)
 
 
@@ -24,7 +24,7 @@ def get_character_comic_data(**kwargs):
     Args:
         kwargs: (dict) api kwargs to be passed directly to requests
     """
-    scraper = MarvelScapper('data/api_data/characters.json')
+    scraper = MarvelScraper('data/api_data/characters.json')
     scraper.get_character_comics(**kwargs)
 
 
@@ -36,7 +36,7 @@ def get_comic_data(**kwargs):
         Args:
             kwargs: (dict) api kwargs to be passed directly to requests
         """
-    scraper = MarvelScapper('data/api_data/comics.json')
+    scraper = MarvelScraper('data/api_data/comics.json')
     scraper.get_comics(**kwargs)
 
 

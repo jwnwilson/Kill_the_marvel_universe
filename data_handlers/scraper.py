@@ -3,12 +3,12 @@ import logging
 
 from api.api import MarvelApi
 from .base import BaseDataHandler
+from .util import get_id_from_url
 
 logger = logging.getLogger(__name__)
 
 
-class MarvelScapper(BaseDataHandler):
-
+class MarvelScraper(BaseDataHandler):
     def __init__(self, api_source_data_file):
         super().__init__()
         self.api = MarvelApi()
@@ -24,15 +24,31 @@ class MarvelScapper(BaseDataHandler):
 
     def _store_raw_api_data(self, url, api_data):
         """
-        We need to store each character by it's index in a dictionary so our reporters
-        can use it later
+        Store each character by it's index in a dictionary so reporters can 
+        use it later in self.api_data
+        Args:
+            url: (str) url data was obtained from
+            api_data: (dict) parsed response dict
+
+        Returns:
+            None
         """
         for result in api_data['data']['results']:
             result_id = result['id']
             self.api_data[result_id] = result
 
     def _update_comic_data(self, url, api_data):
-        character_id = url.split('/')[1]
+        """
+        Update character comic item list from /character/<id>/comics endpoint 
+        data in self.api_data
+        Args:
+            url: (str) url data was obtained from
+            api_data: (dict) parsed response dict
+        
+        Returns:
+            None
+        """
+        character_id = get_id_from_url(url)
         character = self.api_data[character_id]
         character['comics']['items'] = [
             {'resourceURI': x['resourceURI']} for x in api_data['data']['results']]
@@ -46,8 +62,8 @@ class MarvelScapper(BaseDataHandler):
 
             api_data_list = self.api.batch_get(url_batch, param_batch)
 
-            # set backwards through enumerated list so we can safely pop successfull
-            # calls
+            # set backwards through enumerated list so we can safely pop
+            # successfull calls
             i = (len(url_batch) - 1)
             for url, api_data in zip(reversed(url_batch), reversed(api_data_list)):
                 if api_data:
@@ -64,6 +80,14 @@ class MarvelScapper(BaseDataHandler):
             self.write_api_data()
             
     def get_total(self, api_endpoint):
+        """
+        Get total items for api endpoint e.g. 'comics', 'characters'
+        Args:
+            api_endpoint: (str) 
+
+        Returns:
+
+        """
         api_data = self.api.get(api_endpoint, {'limit': 1}, timeout=10)
         if not api_data:
             raise RuntimeError('Initial api call failed please try again.')
@@ -71,7 +95,14 @@ class MarvelScapper(BaseDataHandler):
 
     def get_characters(self, **kwargs):
         """
-        Get api source data for characters and write it to file for use by reporters
+        Get api source data for characters and write it to file for use by 
+        reporters
+        
+        Args:
+            **kwargs: 
+
+        Returns:
+
         """
         start = kwargs.get('start', 0)
         api_max_limit = kwargs.get('limit', 100)
@@ -80,7 +111,7 @@ class MarvelScapper(BaseDataHandler):
         # Get total number of characters
         total_characters = self.get_total('characters')
 
-        # create batch commands for api
+        # create batch commands params for api
         for x in range(start, total_characters, (api_max_limit)):
             params = {'offset': x, 'limit': api_max_limit}
             param_list.append(params)
@@ -92,7 +123,8 @@ class MarvelScapper(BaseDataHandler):
     
     def get_comics(self, **kwargs):
         """
-        Get api source data for comics and write it to file for use by reporters
+        Get api source data for comics and write it to file for use by 
+        reporters
         """
         start = kwargs.get('start', 0)
         api_max_limit = kwargs.get('limit', 100)
@@ -114,7 +146,7 @@ class MarvelScapper(BaseDataHandler):
     def get_character_comics(self, **kwargs):
         """
         Some characters have more than the default limit 20 comics
-        we need to add their remaining commics
+        this will gather the remaining comic data for characters
         
         Returns:
             None

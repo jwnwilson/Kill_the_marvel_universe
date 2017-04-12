@@ -46,16 +46,24 @@ class MarvelApi():
         }
 
     def request(
-            self, method, url, params=None, data=None, async_req=False, timeout=None):
+            self,
+            method,
+            url,
+            params=None,
+            data=None,
+            async_req=False,
+            timeout=None):
         """
         Make a request to the Marvel Api with given params, can also return
         an async request object for grequests to batch call if async_req = True
 
         Args:
             method: (str) standard HTTP method ('GET', 'POST')
+            url: (str) api url without base e.g. 'comics/'
             params: (dict) key values for url params
             data: (dict) body of POST requests
-            async_req: (bool) if True return async request object to be completed later
+            async_req: (bool) if True return async request object to be 
+                        completed later
             timeout: (int) seconds to fail wait before timing out a request
         Returns:
             Response object
@@ -97,6 +105,16 @@ class MarvelApi():
         """
         Make a single GET request to the marvel with url being the path
         and params being the url params
+        
+        Args:
+            url: (str) api url without base e.g. 'comics/'
+            params: (dict) key values for url params 
+            async_req: (bool) if True return async request object to be 
+                        completed later
+            timeout: (int) seconds to fail wait before timing out a request
+
+        Returns:
+            (dict) parsed response data
         """
         params = params or {}
         # default limit is 20 if none is set get max
@@ -109,7 +127,7 @@ class MarvelApi():
 
     def batch_get(self, url_list, param_list=None):
         """
-        Use grequests to asynconously make multiple api calls to speed up the
+        Use grequests to asynchronously make multiple api calls to speed up the
         crawling of the API.
 
         Args:

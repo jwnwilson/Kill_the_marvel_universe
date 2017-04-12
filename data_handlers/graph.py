@@ -4,12 +4,9 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from .exceptions import NotImplemented
+from .util import get_id_from_resource
 
 logger = logging.getLogger(__name__)
-
-
-def _get_id_from_resource(resource_str):
-    return resource_str.split('/')[-1]
 
 
 class CharacterNode():
@@ -22,7 +19,7 @@ class CharacterNode():
     def _get_comic_ids(self):
         for comic in self.data['comics']['items']:
             self.comic_ids.append(
-                _get_id_from_resource(comic['resourceURI']))
+                get_id_from_resource(comic['resourceURI']))
 
     def __repr__(self):
         return '<{} {}>'.format(
@@ -36,10 +33,20 @@ class CharacterGraph():
         self.graph_built = False
 
     def save(self):
+        """
+        Converts all data instances to json strings before saving.
+        Returns:
+
+        """
         raise NotImplemented
         #nx.write_graphml(self.graph, "test.gml")
 
     def load(self):
+        """
+        Reads graph with strs and converts them back to data
+        Returns:
+
+        """
         raise NotImplemented
         #self.graph = nx.read_gml('test.gml')
 

@@ -29,7 +29,8 @@ class MarvelReporter(BaseDataHandler):
             self.input_prefix + data_type + '.json')
 
     def _get_character_list(self, **kwargs):
-        char_list = [self.api_data['characters'][x] for x in self.api_data['characters']]
+        char_list = [
+            self.api_data['characters'][x] for x in self.api_data['characters']]
         if kwargs:
             char_list = sorted(char_list, **kwargs)
         return char_list
@@ -80,12 +81,14 @@ class MarvelReporter(BaseDataHandler):
     def build_character_graph(self):
         characters = self._get_character_list()
         self.character_graph = CharacterGraph()
-        self.character_graph.load_characters(characters, exclude_no_relations=True)
+        self.character_graph.load_characters(
+            characters, exclude_no_relations=True)
         self.character_graph.build_graph(comic_data=self.api_data['comics'])
 
     def _run_algorithm(self, algorithm):
         try:
-            influential_characters_ids = self.character_graph.get_algorithm(algorithm)
+            influential_characters_ids = self.character_graph.get_algorithm(
+                algorithm)
         except AttributeError:
             logger.error('Not implemented')
             raise RuntimeError('Algorithm not implemented')
@@ -95,36 +98,29 @@ class MarvelReporter(BaseDataHandler):
 
         return influential_characters_ids
 
-    def get_most_inbetween_characters(self, limit=None, show_graph=True):
-        return self.get_characters_centrality(
-            limit=limit,
-            algorithm='betweenness_centrality',
-            show_graph=show_graph)
-
-    def get_most_influential_characters(self, limit=None, show_graph=True):
-        # Set empty influence value
-        for char_id in self.api_data['characters']:
-            self.api_data['characters'][char_id]['neighbor_influence'] = 0
-
-        self.build_character_graph()
-        self.character_graph.calculate_influence_from_neighbors()
-        influential_characters = self._get_character_list(
-            key=lambda x: x['neighbor_influence'], reverse=True)
-
-        influential_characters = self._limit_list(
-            influential_characters, limit)
-
-        influential_characters = self._get_list_character_attrs(
-            influential_characters, ['name', 'neighbor_influence'])
-
-        sys.stdout.write(self._format_data_list(
-            influential_characters))
-
     def get_characters_centrality(
             self,
             limit=None,
             algorithm='degree',
             show_graph=True):
+        """
+        Run networkx centrality algorithm against the current graph, then output
+        data to stdout we can run various algorithms:
+        
+        'degree',
+        'eigenvector_centrality',
+        'betweenness_centrality',
+        'katz_centrality,
+        'closeness_centrality'
+        
+        Args:
+            limit: (int) limit number of results returned 
+            algorithm: (str) algorithm to run on graph
+            show_graph: (bool) if True render and show graph
+
+        Returns:
+            None
+        """
 
         self.build_character_graph()
         influential_characters_ids = self._run_algorithm(algorithm)
