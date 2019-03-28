@@ -1,6 +1,10 @@
+import re
+
 def get_id_from_resource(resource_str):
-    return resource_str.split('/')[-1]
+    import pdb;pdb.set_trace()
+    return re.find(r'\/\d+\/', url)
 
 
 def get_id_from_url(url):
-    return url.split('/')[-1]
+    import pdb;pdb.set_trace()
+    return re.find(r'\/\d+\/', url)
