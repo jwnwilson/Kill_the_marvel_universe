@@ -3,7 +3,7 @@ decorator==4.0.11
 freezegun==0.3.8
 grequests==0.3.0
 matplotlib==3.0.3
-networkx==1.11
+networkx==2.2
 numpy==1.16.2
 py==1.4.33
 pyparsing==2.2.0
