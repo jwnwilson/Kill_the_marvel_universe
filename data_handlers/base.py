@@ -23,7 +23,7 @@ class BaseDataHandler():
     def write_api_data(self, file_path, data):
         try:
             with open(file_path, 'wb') as output_fp:
-                output_fp.write(data)
+                output_fp.write(json.dumps(data))
         except (IOError, JSONDecodeError):
             logger.error('Unable to write api data file.')
 
